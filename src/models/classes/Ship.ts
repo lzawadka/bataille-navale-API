@@ -4,8 +4,8 @@ import type {
   ShipOrientation,
   ShipType,
 } from "battleship-types";
-import { EShipOrientation } from "../enum/EShipOrientation";
-import { EShipType } from "../enum/EShipType";
+import { EShipOrientation } from "../enums/EShipOrientation";
+import { EShipType } from "../enums/EShipType";
 
 export class Ship implements IShip {
   public type: ShipType;

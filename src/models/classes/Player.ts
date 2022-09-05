@@ -8,7 +8,7 @@ import type {
   Location,
   PointStatus,
 } from "battleship-types";
-import { EShipType } from "../enum/EShipType";
+import { EShipType } from "../enums/EShipType";
 import Ship from "./Ship";
 
 class Player implements IPlayer {

@@ -1,5 +1,5 @@
 import type { IPoint, Location, PointStatus } from "battleship-types";
-import { EPointStatus } from "../enum/EPointStatus";
+import { EPointStatus } from "../enums/EPointStatus";
 
 class Point implements IPoint {
   public location: Location;

@@ -28,7 +28,8 @@ io.on("connection", (socket) => {
       roomId: roomId,
       role: "creator"
     }
-    callBack(player1)
+    callBack(player1);
+    socket.emit("initGame", false);
   })
 
   socket.on("joinGame", (roomId, callBack) => {

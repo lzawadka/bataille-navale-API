@@ -4,8 +4,9 @@ export interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
   received: (player: Player) => void;
   errorMessage: (message: string) => void;
-  updateOpponentBoard: (board: Board) => void;
+  updateOpponentBoard: (point: Point) => void;
   endGame: (player: Player) => void;
+  initGame: (isFull: boolean) => void;
 }
 
 export interface ClientToServerEvents {
@@ -13,7 +14,7 @@ export interface ClientToServerEvents {
   customEvent: (player: Player) => void;
   joinGame: (roomId: string, callBack: Function) => void;
   createGame: (callBack: Function) => void;
-  updateBoard: (roomId: string, board: Board) => void;
+  updateBoard: (roomId: string, point: Point) => void;
   endGame: (player: Player) => void;
 
 }
@@ -57,7 +58,7 @@ export interface Ship {
 export interface Point {
   x: number,
   y: number,
-  state: boolean
+  status: boolean
 }
 
 export interface Board {

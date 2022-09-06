@@ -1,17 +1,16 @@
 import dotenv from "dotenv";
 import { createServer } from 'http';
 import { Server, Socket } from "socket.io";
-import express, { Response } from "express";
-import { Board, ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
-import { StringifyOptions } from "querystring";
-import { callbackify } from "util";
+import express from "express";
+import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
 
+// #region config
 dotenv.config();
-
 const port: number = 8080;
 const app = express();
 const httpServer = createServer(app);
 let countAllRoom: CountRoom[] = [];
+// #endregion config
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
   cors: {
@@ -19,11 +18,6 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
   }
 });
 
-app.get("/", (_, res: Response) => {
-  res.send("Express + TypeScript Server");
-});
-
-// Server to client
 io.on("connection", (socket) => {
 
   socket.on("createGame", (callBack) => {
@@ -53,13 +47,15 @@ io.on("connection", (socket) => {
       role: "opponent",
     }
     callBack(player2)
+
+    socket.emit("initGame", true);
   })
 
-  socket.on("updateBoard", (roomId, board) => {
+  socket.on("updateBoard", (roomId, updatedPoint) => {
     socket
       .broadcast
       .in(roomId)
-      .emit("updateOpponentBoard", board);
+      .emit("updateOpponentBoard", updatedPoint);
   })
 
   socket.on("endGame", (player) => {
@@ -78,12 +74,22 @@ function joinRoom(
   countPlayerInRoom(roomId, count);
 }
 
-function countPlayerInRoom(roomId: string, countToSet: number): CountRoom {
+function countPlayerInRoom(
+  roomId: string, 
+  countToSet: number
+  ): CountRoom {
+  const existingRoom: CountRoom | undefined = countAllRoom.find(x => x.roomId == roomId);
+  const indexExistingRoom: number = countAllRoom.findIndex(x => x.roomId == roomId)
   let room: CountRoom = {
     roomId,
     clientCount: countToSet
-  }
-  countAllRoom.push(room);
+  };
+  
+  if(!!existingRoom)
+    countAllRoom[indexExistingRoom] = room;
+  else
+    countAllRoom.push(room);
+
   return room;
 }
 

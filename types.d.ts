@@ -6,7 +6,7 @@ export interface ServerToClientEvents {
   errorMessage: (message: string) => void;
   updateOpponentBoard: (point: Point) => void;
   endGame: (player: Player) => void;
-  initGame: (isFull: boolean) => void;
+  startGame: (isFull: boolean) => void;
 }
 
 export interface ClientToServerEvents {

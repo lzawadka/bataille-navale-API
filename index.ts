@@ -36,10 +36,16 @@ io.on("connection", (socket) => {
     const isRoomFull: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
 
     if(!countAllRoom.find(x => x.roomId == roomId))
-      socket.emit("errorMessage", `Room ${roomId} whas not found`);
-
+    {
+      socket.emit("errorMessage", `Room ${roomId} was not found`);
+      throw Error(`Room ${roomId} whas not found`);
+    }
+      
     if(isRoomFull)
-      socket.emit("errorMessage", `Room ${roomId} is full`)
+    {
+      callBack(`Room ${roomId} is full`);
+      throw Error(`Room ${roomId} is full`);
+    }
 
     joinRoom(socket, roomId, 2);
     const player2: Player = {
@@ -49,7 +55,7 @@ io.on("connection", (socket) => {
     }
     callBack(player2)
 
-    socket.emit("initGame", true);
+    socket.emit("startGame", true);
   })
 
   socket.on("updateBoard", (roomId, updatedPoint) => {

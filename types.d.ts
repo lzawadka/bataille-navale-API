@@ -4,13 +4,18 @@ export interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
   received: (player: Player) => void;
   errorMessage: (message: string) => void;
+  updateOpponentBoard: (board: Board) => void;
+  endGame: (player: Player) => void;
 }
 
 export interface ClientToServerEvents {
   hello: () => void;
   customEvent: (player: Player) => void;
-  joinRoom: (roomId: string, callBack: Function) => void;
-  createRoom: (roomId: string, callBack: Function) => void;
+  joinGame: (roomId: string, callBack: Function) => void;
+  createGame: (callBack: Function) => void;
+  updateBoard: (roomId: string, board: Board) => void;
+  endGame: (player: Player) => void;
+
 }
 
 export interface InterServerEvents {
@@ -25,9 +30,38 @@ export interface SocketData {
 export interface Player {
   name: string;
   roomId: string;
+  role: "opponent" | "creator";
 }
 
 export interface CountRoom {
   clientCount: number;
   roomId: string;
+}
+
+export enum EShip {
+  Destroyer,
+  Submarine,
+  Cruiser,
+  Battleship,
+  Carrier
+} 
+
+export interface Ship {
+  name: EShip;
+  size: number;
+  orientation: "vertical" | "horizontal";
+  spaceOccupied: Point[];
+  isSunk: boolean;
+}
+
+export interface Point {
+  x: number,
+  y: number,
+  state: boolean
+}
+
+export interface Board {
+  ship: Ship[],
+  ocean: Point[],
+  player: Player;
 }

@@ -2,8 +2,9 @@ import dotenv from "dotenv";
 import { createServer } from 'http';
 import { Server, Socket } from "socket.io";
 import express, { Response } from "express";
-import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
+import { Board, ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
 import { StringifyOptions } from "querystring";
+import { callbackify } from "util";
 
 dotenv.config();
 
@@ -24,17 +25,19 @@ app.get("/", (_, res: Response) => {
 
 // Server to client
 io.on("connection", (socket) => {
-  socket.on('customEvent', (player: Player) => {
-    player.name = "mabite"
-    player.roomId = socket.id;
-    socket.broadcast.emit('received', player);
+
+  socket.on("createGame", (callBack) => {
+    const roomId: string = socket.id;
+    joinRoom(socket, roomId, 1);
+    const player1: Player = {
+      name: "Player 1",
+      roomId: roomId,
+      role: "creator"
+    }
+    callBack(player1)
   })
 
-  socket.on("createRoom", (roomId, callBack: Function) => {
-    joinRoom(socket, roomId);
-  })
-
-  socket.on("joinRoom", (roomId, callBack: Function) => {
+  socket.on("joinGame", (roomId, callBack) => {
     const isRoomFull: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
 
     if(!countAllRoom.find(x => x.roomId == roomId))
@@ -44,15 +47,32 @@ io.on("connection", (socket) => {
       socket.emit("errorMessage", `Room ${roomId} is full`)
 
     joinRoom(socket, roomId, 2);
+    const player2: Player = {
+      name: "Player 2",
+      roomId: roomId,
+      role: "opponent",
+    }
+    callBack(player2)
+  })
 
-    callBack(`You are connected to room ${roomId}`)
+  socket.on("updateBoard", (roomId, board) => {
+    socket
+      .broadcast
+      .in(roomId)
+      .emit("updateOpponentBoard", board);
+  })
+
+  socket.on("endGame", (player) => {
+    socket
+      .in(player.roomId)
+      .emit("endGame", player)
   })
 });
 
 function joinRoom(
   socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, 
   roomId: string, 
-  count: number = 1
+  count: number
   ): void {
   socket.join(roomId);
   countPlayerInRoom(roomId, count);

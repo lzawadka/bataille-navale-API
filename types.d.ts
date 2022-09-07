@@ -16,7 +16,6 @@ export interface ClientToServerEvents {
   createGame: (callBack: Function) => void;
   updateBoard: (roomId: string, point: Point) => void;
   endGame: (player: Player) => void;
-
 }
 
 export interface InterServerEvents {

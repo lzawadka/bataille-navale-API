@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server, Socket } from "socket.io";
 import express from "express";
 import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
+import { callbackify } from "util";
 
 // #region config
 dotenv.config();
@@ -20,7 +21,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 
 io.on("connection", (socket) => {
 
-  socket.on("createGame", (callBack) => {
+  socket.on("createGame", callBack => {
     const roomId: string = socket.id;
     joinRoom(socket, roomId, 1);
     const player1: Player = {
@@ -29,33 +30,37 @@ io.on("connection", (socket) => {
       role: "creator"
     }
     callBack(player1);
-    socket.emit("initGame", false);
+    socket.in(roomId).emit("startGame", false);
   })
 
   socket.on("joinGame", (roomId, callBack) => {
-    const isRoomFull: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
+    const isFullRoom: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount > 2);
+    const isRoomReadyToStart: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
 
     if(!countAllRoom.find(x => x.roomId == roomId))
     {
-      socket.emit("errorMessage", `Room ${roomId} was not found`);
-      throw Error(`Room ${roomId} whas not found`);
+      socket.in(roomId).emit("errorMessage", `Room ${roomId} was not found`);
+      throw Error(`Room ${roomId} waas not found`);
     }
       
-    if(isRoomFull)
+    if(isFullRoom)
     {
-      callBack(`Room ${roomId} is full`);
+      socket.in(roomId).emit("errorMessage",`Room ${roomId} is full`);
       throw Error(`Room ${roomId} is full`);
     }
 
-    joinRoom(socket, roomId, 2);
-    const player2: Player = {
-      name: "Player 2",
-      roomId: roomId,
-      role: "opponent",
+    if(!isRoomReadyToStart)
+    {
+      joinRoom(socket, roomId, 2);
+      const player2: Player = {
+        name: "Player 2",
+        roomId: roomId,
+        role: "opponent",
+      }
+      callBack(player2)
     }
-    callBack(player2)
-
-    socket.emit("startGame", true);
+    
+    io.in(roomId).emit("startGame", isRoomReadyToStart);
   })
 
   socket.on("updateBoard", (roomId, updatedPoint) => {

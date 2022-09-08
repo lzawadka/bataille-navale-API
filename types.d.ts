@@ -13,8 +13,8 @@ export interface ClientToServerEvents {
   hello: () => void;
   customEvent: (player: Player) => void;
   joinGame: (roomId: string, callBack: Function) => void;
-  createGame: (callBack: Function) => void;
-  updateBoard: (roomId: string, point: Point) => void;
+  createGame: (gameId: string, callBack: Function) => void;
+  updateBoard: (gameId: string, point: Point) => void;
   endGame: (player: Player) => void;
 }
 
@@ -29,7 +29,6 @@ export interface SocketData {
 
 export interface Player {
   name: string;
-  roomId: string;
   role: "opponent" | "creator";
 }
 
@@ -44,7 +43,7 @@ export enum EShip {
   Cruiser,
   Battleship,
   Carrier
-} 
+}
 
 export interface Ship {
   name: EShip;

@@ -21,45 +21,39 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
 
 io.on("connection", (socket) => {
 
-  socket.on("createGame", callBack => {
-    const roomId: string = socket.id;
-    joinRoom(socket, roomId, 1);
+  socket.on("createGame", (gameId, callBack) => {
+    joinRoom(socket, gameId, 1);
     const player1: Player = {
       name: "Player 1",
-      roomId: roomId,
       role: "creator"
     }
     callBack(player1);
-    socket.in(roomId).emit("startGame", false);
+    socket.in(gameId).emit("startGame", false);
   })
 
   socket.on("joinGame", (roomId, callBack) => {
     const isFullRoom: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount > 2);
     const isRoomReadyToStart: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
 
-    if(!countAllRoom.find(x => x.roomId == roomId))
-    {
+    if (!countAllRoom.find(x => x.roomId == roomId)) {
       socket.in(roomId).emit("errorMessage", `Room ${roomId} was not found`);
       throw Error(`Room ${roomId} was not found`);
     }
-      
-    if(isFullRoom)
-    {
-      socket.in(roomId).emit("errorMessage",`Room ${roomId} is full`);
+
+    if (isFullRoom) {
+      socket.in(roomId).emit("errorMessage", `Room ${roomId} is full`);
       throw Error(`Room ${roomId} is full`);
     }
 
-    if(!isRoomReadyToStart)
-    {
+    if (!isRoomReadyToStart) {
       joinRoom(socket, roomId, 2);
       const player2: Player = {
         name: "Player 2",
-        roomId: roomId,
         role: "opponent",
       }
       callBack(player2)
     }
-    
+
     io.in(roomId).emit("startGame", isRoomReadyToStart);
   })
 
@@ -70,34 +64,34 @@ io.on("connection", (socket) => {
       .emit("updateOpponentBoard", updatedPoint);
   })
 
-  socket.on("endGame", (player) => {
-    socket
-      .in(player.roomId)
-      .emit("endGame", player)
-  })
+  // socket.on("endGame", (player) => {
+  //   socket
+  //     .in(player)
+  //     .emit("endGame", player)
+  // })
 });
 
 function joinRoom(
-  socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, 
-  roomId: string, 
+  socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>,
+  roomId: string,
   count: number
-  ): void {
+): void {
   socket.join(roomId);
   countPlayerInRoom(roomId, count);
 }
 
 function countPlayerInRoom(
-  roomId: string, 
+  roomId: string,
   countToSet: number
-  ): CountRoom {
+): CountRoom {
   const existingRoom: CountRoom | undefined = countAllRoom.find(x => x.roomId == roomId);
   const indexExistingRoom: number = countAllRoom.findIndex(x => x.roomId == roomId)
   let room: CountRoom = {
     roomId,
     clientCount: countToSet
   };
-  
-  if(!!existingRoom)
+
+  if (!!existingRoom)
     countAllRoom[indexExistingRoom] = room;
   else
     countAllRoom.push(room);

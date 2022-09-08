@@ -49,19 +49,22 @@ export enum EShip {
 export interface Ship {
   name: EShip;
   size: number;
+}
+
+export interface ShipOnMap {
+  ship: Ship;
   orientation: "vertical" | "horizontal";
   spaceOccupied: Point[];
-  isSunk: boolean;
 }
 
 export interface Point {
   x: number,
   y: number,
-  status: boolean
+  status: "touch" | "notTouch" | "etc"
 }
 
 export interface Board {
-  ship: Ship[],
-  ocean: Point[],
+  ships: Ship[],
+  opponentBoard: Point[],
   player: Player;
 }

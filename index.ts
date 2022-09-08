@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
     if(!countAllRoom.find(x => x.roomId == roomId))
     {
       socket.in(roomId).emit("errorMessage", `Room ${roomId} was not found`);
-      throw Error(`Room ${roomId} waas not found`);
+      throw Error(`Room ${roomId} was not found`);
     }
       
     if(isFullRoom)

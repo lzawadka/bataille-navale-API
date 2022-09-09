@@ -11,10 +11,10 @@ export interface ServerToClientEvents {
   updateOpponentBoard: (board: IBoard, player: IPlayer) => void;
   endGame: (player: IPlayer) => void;
   startGame: (isFull: boolean) => void;
-  isPlayerReadyToPlayToClient: (isReady: boolean) => void;
+  isPlayerReadyToPlayToClient: (playerName: string, isReady: boolean) => void;
   isGameReadyToStart: (isReady: boolean) => void;
 }
-  
+
 export interface ClientToServerEvents {
   hello: () => void;
   customEvent: (player: IPlayer) => void;

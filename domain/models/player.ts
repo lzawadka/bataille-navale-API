@@ -18,6 +18,6 @@ export interface IPlayerInGame {
 export interface IPlayer {
     name: string;
     role: '' | "opponent" | "creator";
-    isReady: boolean;
+    isReadyToPlay: boolean;
 }
 

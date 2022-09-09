@@ -6,11 +6,11 @@ import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketDa
 import { Game } from "./domain/models/game";
 import { IPlayer } from "./domain/models/player";
 import { SocketService } from "./services/SocketService";
-import { GameService } from "./services/gameService";
+import { GameService } from "./services/GameService";
 
 // #region config
 dotenv.config();
-const port: string | undefined = process.env.SERVER_PORT_LOCAL;
+const port: string = process.env.SERVER_PORT_LOCAL ?? '8080';
 const app = express();
 const httpServer = createServer(app);
 const playerInRoom: Game[] = [];
@@ -31,10 +31,10 @@ io.on("connection", (socket) => {
   socketService.joinGame(playerInRoom, io);
 
   socketService.updateBoard();
-  
+
   socketService.endGame();
 
-  socketService.isReadyToPlay(playerInRoom, io)
+  socketService.readyToPlay(playerInRoom, io)
 
 });
 

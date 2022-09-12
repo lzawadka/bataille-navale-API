@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "",
   "main": "index.ts",
+  "engines": {
+    "node": "14.16.0"
+  },
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc && copyfiles dist/**/* dist/",

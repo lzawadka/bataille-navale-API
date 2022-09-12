@@ -73,7 +73,7 @@ export class SocketService {
 			this.m_socket
 				.broadcast
 				.in(gameId)
-				.emit("updateOpponentBoard", board, player);
+				.emit("boardUpdated", board, player);
 		})
 	}
 

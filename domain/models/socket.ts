@@ -8,7 +8,7 @@ export interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
   received: (player: IPlayer) => void;
   errorMessage: (message: string) => void;
-  updateOpponentBoard: (board: IBoard, player: IPlayer) => void;
+  boardUpdated: (board: IBoard, player: IPlayer) => void;
   endGame: (player: IPlayer) => void;
   startGame: (isFull: boolean) => void;
   isPlayerReadyToPlayToClient: (playerName: string, isReady: boolean, board: IBoard) => void;

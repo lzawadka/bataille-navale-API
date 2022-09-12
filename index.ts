@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import express from "express";
 import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData } from "./domain/models/socket";
 import { Game } from "./domain/models/game";
-import { IPlayer } from "./domain/models/player";
 import { SocketService } from "./services/SocketService";
 import { GameService } from "./services/GameService";
 
@@ -19,9 +18,9 @@ const playerInRoom: Game[] = [];
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
   cors: {
     origin: process.env.CLIENT_URL
-  }
+  },
+  transports: ['websocket'] 
 });
-
 io.on("connection", (socket) => {
 
   const socketService = new SocketService(socket, new GameService());

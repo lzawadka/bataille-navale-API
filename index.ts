@@ -1,16 +1,20 @@
 import dotenv from "dotenv";
 import { createServer } from 'http';
-import { Server, Socket } from "socket.io";
-import express, { Response } from "express";
-import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData, Player, CountRoom } from "./types";
-import { StringifyOptions } from "querystring";
+import { Server } from "socket.io";
+import express from "express";
+import { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData } from "./domain/models/socket";
+import { Game } from "./domain/models/game";
+import { IPlayer } from "./domain/models/player";
+import { SocketService } from "./services/SocketService";
+import { GameService } from "./services/GameService";
 
+// #region config
 dotenv.config();
-
-const port: number = 8080;
+const port: string = process.env.SERVER_PORT_LOCAL ?? '8080';
 const app = express();
 const httpServer = createServer(app);
-let countAllRoom: CountRoom[] = [];
+const playerInRoom: Game[] = [];
+// #endregion config
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
   cors: {
@@ -18,54 +22,21 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
   }
 });
 
-app.get("/", (_, res: Response) => {
-  res.send("Express + TypeScript Server");
-});
-
-// Server to client
 io.on("connection", (socket) => {
-  socket.on('customEvent', (player: Player) => {
-    player.name = "mabite"
-    player.roomId = socket.id;
-    socket.broadcast.emit('received', player);
-  })
 
-  socket.on("createRoom", (roomId, callBack: Function) => {
-    joinRoom(socket, roomId);
-  })
+  const socketService = new SocketService(socket, new GameService());
 
-  socket.on("joinRoom", (roomId, callBack: Function) => {
-    const isRoomFull: boolean = !!countAllRoom.find(x => x.roomId == roomId && x.clientCount == 2);
+  socketService.createGame(playerInRoom);
 
-    if(!countAllRoom.find(x => x.roomId == roomId))
-      socket.emit("errorMessage", `Room ${roomId} whas not found`);
+  socketService.joinGame(playerInRoom, io);
 
-    if(isRoomFull)
-      socket.emit("errorMessage", `Room ${roomId} is full`)
+  socketService.updateBoard();
 
-    joinRoom(socket, roomId, 2);
+  socketService.endGame();
 
-    callBack(`You are connected to room ${roomId}`)
-  })
+  socketService.readyToPlay(playerInRoom, io)
+
 });
-
-function joinRoom(
-  socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>, 
-  roomId: string, 
-  count: number = 1
-  ): void {
-  socket.join(roomId);
-  countPlayerInRoom(roomId, count);
-}
-
-function countPlayerInRoom(roomId: string, countToSet: number): CountRoom {
-  let room: CountRoom = {
-    roomId,
-    clientCount: countToSet
-  }
-  countAllRoom.push(room);
-  return room;
-}
 
 httpServer.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);

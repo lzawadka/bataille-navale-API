@@ -10,7 +10,7 @@ import { GameService } from "./services/GameService";
 
 // #region config
 dotenv.config();
-const port: string = process.env.SERVER_PORT_LOCAL ?? '8080';
+const port: string = process.env.SERVER_PORT_LOCAL || '8080';
 const app = express();
 const httpServer = createServer(app);
 const playerInRoom: Game[] = [];

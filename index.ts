@@ -19,7 +19,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEve
   cors: {
     origin: process.env.CLIENT_URL
   },
-  transports: ['websocket'] 
+  transports: ['websocket', 'polling'] 
 });
 io.on("connection", (socket) => {
 

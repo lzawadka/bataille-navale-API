@@ -89,7 +89,7 @@ export class SocketService {
 		playerReadyInRoom: Game[],
 		io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>
 	): void {
-		this.m_socket.on("isPlayerReadyToPlay", (gameId, playerName, isReady) => {
+		this.m_socket.on("isPlayerReadyToPlay", (gameId, playerName, isReady, board) => {
 			const foundGame: Game | undefined = this.m_gameService.getGameById(gameId, playerReadyInRoom);
 
 			if (!foundGame) {
@@ -99,11 +99,12 @@ export class SocketService {
 
 			if (foundGame.playerReady === 0) {
 				this.m_gameService.playerInGame(gameId, 2, playerReadyInRoom, 1);
-				this.m_socket.broadcast.in(gameId).emit("isPlayerReadyToPlayToClient", playerName, isReady);
+				this.m_socket.broadcast.in(gameId).emit("isPlayerReadyToPlayToClient", playerName, isReady, board);
 			}
 
 			if (foundGame.playerReady === 1) {
 				this.m_gameService.playerInGame(gameId, 2, playerReadyInRoom, 2);
+				this.m_socket.broadcast.in(gameId).emit("isPlayerReadyToPlayToClient", playerName, isReady, board);
 				io.in(gameId).emit("isGameReadyToStart", isReady);
 			}
 		})

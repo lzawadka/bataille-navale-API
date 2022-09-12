@@ -11,7 +11,7 @@ export interface ServerToClientEvents {
   updateOpponentBoard: (board: IBoard, player: IPlayer) => void;
   endGame: (player: IPlayer) => void;
   startGame: (isFull: boolean) => void;
-  isPlayerReadyToPlayToClient: (playerName: string, isReady: boolean) => void;
+  isPlayerReadyToPlayToClient: (playerName: string, isReady: boolean, board: IBoard) => void;
   isGameReadyToStart: (isReady: boolean) => void;
 }
 
@@ -22,7 +22,7 @@ export interface ClientToServerEvents {
   createGame: (gameId: string, callBack: Function) => void;
   updateBoard: (gameId: string, board: IBoard, player: IPlayer) => void;
   endGame: (gameId: string, player: IPlayer) => void;
-  isPlayerReadyToPlay: (gameId: string, playerName: string, isReady: boolean) => void;
+  isPlayerReadyToPlay: (gameId: string, playerName: string, isReady: boolean, board: IBoard) => void;
 }
 
 export interface InterServerEvents {

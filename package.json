@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "api": "nodemon --watch 'src' index.ts -L"
+    "api": "nodemon --watch 'src' index.ts -L",
+    "start": "npm run api"
   },
   "author": "",
   "license": "ISC",

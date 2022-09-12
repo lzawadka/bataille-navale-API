@@ -18,7 +18,7 @@ const playerInRoom: Game[] = [];
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {
   cors: {
-    origin: "http://localhost:3000"
+    origin: process.env.CLIENT_URL
   }
 });
 

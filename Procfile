@@ -1,1 +1,1 @@
-web:npm run api
+web: ./bin/www npm start

@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
-    "api": "nodemon --watch 'src' index.ts -L",
-    "start": "npm run api"
+    "build": "npm run clean && tsc && copyfiles dist/*/ dist/",
+    "start": "npm run api",
+    "api": "nodemon --watch 'src' index.ts -L"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "copyfiles": "^2.4.1",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "socket.io": "^4.5.2"
